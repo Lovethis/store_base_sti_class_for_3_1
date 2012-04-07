@@ -37,7 +37,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord (>= 3.2.3)
+  activerecord
   bundler
   jeweler
   simplecov

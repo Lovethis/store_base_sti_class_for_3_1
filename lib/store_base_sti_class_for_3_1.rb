@@ -1,6 +1,6 @@
 require 'active_record'
 
-if ActiveRecord::VERSION::STRING =~ /^3\.1/
+if ActiveRecord::VERSION::STRING =~ /^3\.(1|2)/
   module ActiveRecord
 
     class Base

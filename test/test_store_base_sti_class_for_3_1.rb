@@ -1,13 +1,13 @@
 require 'helper'
 require 'active_record/test_case'
 
-class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
+class TestStoreBaseStiNameFor32 < ActiveRecord::TestCase
 
   def setup
     @old_store_base_sti_class = ActiveRecord::Base.store_base_sti_class
     ActiveRecord::Base.store_base_sti_class = false
     
-    @thinking_post = SpecialPost.create(:title => 'Thinking')
+    @thinking_post = SpecialPost.create!(:title => 'Thinking', :body => "Body of Thinking")
     @misc_tag = Tag.create(:name => 'Misc')
   end
 
@@ -18,21 +18,21 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
   def test_polymorphic_belongs_to_assignment_with_inheritance
     # should update when assigning a saved record
     tagging = Tagging.new
-    post = SpecialPost.create(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    post = SpecialPost.create(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
     tagging.taggable = post
     assert_equal post.id, tagging.taggable_id
     assert_equal "SpecialPost", tagging.taggable_type
   
     # should update when assigning a new record
     tagging = Tagging.new
-    post = SpecialPost.new(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    post = SpecialPost.new(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
     tagging.taggable = post
     assert_nil tagging.taggable_id
     assert_equal "SpecialPost", tagging.taggable_type
   end
   
   def test_polymorphic_has_many_create_model_with_inheritance
-    post = SpecialPost.new(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    post = SpecialPost.new(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
   
     tagging = @misc_tag.taggings.create(:taggable => post)
     assert_equal "SpecialPost", tagging.taggable_type
@@ -42,7 +42,7 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
   end
   
   def test_polymorphic_has_one_create_model_with_inheritance
-    post = SpecialPost.new(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    post = SpecialPost.new(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
   
     tagging = @misc_tag.create_tagging(:taggable => post)
     assert_equal "SpecialPost", tagging.taggable_type
@@ -60,13 +60,13 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
 
   def test_polymorphic_has_many_through_create_via_association
     tag = SpecialTag.create!(:name => 'Special')
-    post = tag.polytagged_posts.create!(:title => 'To Be or Not To Be?')
+    post = tag.polytagged_posts.create!(:title => 'To Be or Not To Be?', :body => "Body")
     
     assert_equal "SpecialTag", tag.polytaggings.first.polytag_type
   end
   
   def test_include_polymorphic_has_one
-    post = SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    post = SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
     tagging = post.create_tagging(:tag => @misc_tag)
   
     post = Post.find(post.id, :include => :tagging)
@@ -75,7 +75,7 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
   
   def test_include_polymorphic_has_many
     tag = SpecialTag.create!(:name => 'Special')
-    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body", :body => "Body")
     tag.polytagged_posts << @thinking_post
   
     tag = Tag.find(tag.id, :include => :polytaggings)
@@ -84,7 +84,7 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
   
   def test_include_polymorphic_has_many_through
     tag = SpecialTag.create!(:name => 'Special')
-    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
     tag.polytagged_posts << @thinking_post
   
     tag = Tag.find(tag.id, :include => :polytagged_posts)
@@ -93,7 +93,7 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
   
   def test_join_polymorhic_has_many
     tag = SpecialTag.create!(:name => 'Special')
-    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
     tag.polytagged_posts << @thinking_post
   
     assert Tag.find_by_id(tag.id, :joins => :polytaggings, :conditions => [ 'taggings.id = ?', tag.polytaggings.first.id ])
@@ -101,7 +101,7 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
   
   def test_join_polymorhic_has_many_through
     tag = SpecialTag.create!(:name => 'Special')
-    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
     tag.polytagged_posts << @thinking_post
   
     assert Tag.find_by_id(tag.id, :joins => :polytagged_posts, :conditions => [ 'posts.id = ?', tag.polytaggings.first.taggable_id ])
@@ -109,8 +109,8 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
   
   def test_has_many_through_polymorphic_has_one
     author       = Author.create!(:name => 'Bob')
-    post         = Post.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :author => author)
-    special_post = SpecialPost.create!(:title => 'IBM Watson''s Jeopardy play', :author => author)
+    post         = Post.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :author => author, :body => "Body")
+    special_post = SpecialPost.create!(:title => 'IBM Watson''s Jeopardy play', :author => author, :body => "Body")
     special_tag  = SpecialTag.create!(:name => 'SpecialGeneral')
   
     taggings = [ post.taggings.create(:tag => special_tag), special_post.taggings.create(:tag => special_tag) ]
@@ -119,7 +119,7 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
     
   def test_has_many_polymorphic_with_source_type
     tag = SpecialTag.create!(:name => 'Special')
-    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit')
+    tag.polytagged_posts << SpecialPost.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :body => "Body")
     tag.polytagged_posts << @thinking_post
 
     tag.save!
@@ -151,7 +151,7 @@ class TestStoreBaseStiNameFor30 < ActiveRecord::TestCase
 
   def test_finder_sql_is_supported
     author       = Author.create!(:name => 'Bob')
-    post         = Post.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :author => author)
+    post         = Post.create!(:title => 'Budget Forecasts Bigger 2011 Deficit', :author => author, :body => "Body")
     special_tag  = Tag.create!(:name => 'SpecialGeneral')
     post.taggings.create(:tag => special_tag)
 
